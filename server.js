@@ -130,7 +130,18 @@ app.put('/todos/:id', function (req, res) {
 });
 
 
+//POST /users
 
+app.post('/users', function(req, res){
+    //filter the items by the one that should be aloud to be added
+    var body = _.pick(req.body, 'email', 'password');
+    //call user.create with the data if(works){send 200 with data}else{send back 400 and error}
+    db.user.create(body).then(function(user){
+        res.json(user.toJSON());
+    }, function(e) {
+        res.status(400).json(e);
+    });
+});
 
 
 
