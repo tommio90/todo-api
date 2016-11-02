@@ -17,7 +17,16 @@ app.get('/', function(req, res) {
 	res.send('Todo API Root');
 });
 
+//GET/ WORDS
+//this query will give access to the whole DB, turning the app in a dictionary such as pleco.
+// use the DB downloaded, ( dunno if is the best way, probaby at this stage we should include just the most common words)
+// implemet a system to search not only the words but also full sentences.
+
+
 // GET /todos?completed=false&q=work
+// This API request will search the SPECIFIC USER WORDS ACCORDING TO SOME QUERIES from the database and return to the user.
+//Connection to Angular JS 2 and database implemented with Mongodb;
+// This GET request require the middleware, therefore the user must be authenticated;
 app.get('/todos', middleware.requireAuthentication, function(req, res) {
 	var query = req.query;
 	var where = {
@@ -46,6 +55,8 @@ app.get('/todos', middleware.requireAuthentication, function(req, res) {
 });
 
 // GET /todos/:id
+// this API call will return all the users WORDS 
+// It will be the filler for the user profile and the clustering will be done front end on Angular
 app.get('/todos/:id', middleware.requireAuthentication, function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
 
@@ -65,7 +76,10 @@ app.get('/todos/:id', middleware.requireAuthentication, function(req, res) {
 	});
 });
 
+
+
 // POST /todos
+// this will aloud the user to create new sentences. 
 app.post('/todos', middleware.requireAuthentication, function(req, res) {
 	var body = _.pick(req.body, 'description', 'completed');
 
@@ -136,6 +150,10 @@ app.put('/todos/:id', middleware.requireAuthentication, function(req, res) {
 	});
 });
 
+
+
+//POST/ users 
+//users sign up
 app.post('/users', function (req, res) {
 	var body = _.pick(req.body, 'email', 'password');
 
