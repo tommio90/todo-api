@@ -5,6 +5,7 @@ var db = require('./db.js');
 var bcrypt = require('bcrypt');
 var middleware = require('./middleware.js')(db);
 
+var translate = require('./services/translate.js');
 var app = express();
 var PORT = process.env.PORT || 3000;
 var todos = [];
@@ -16,6 +17,37 @@ app.use(bodyParser.json());
 app.get('/', function(req, res) {
 	res.send('Todo API Root');
 });
+
+
+
+
+//POST/wordzh
+//this method aloud the creation of a database starting from json file I input
+app.post('/wordzh', function(req,res){
+	var body = _.pick(req.body, 'hsk' ,'hanzi', 'pinyin', 'meaning');
+	console.log(body);
+	db.wordzh.create(body).then(function(wordzh){
+		res.json(wordzh.toJSON());
+	}, function(e){
+		res.status(400).json(e);
+	});
+});
+
+//POST/wordbook
+
+// app.post('/woordbook', function(req,res){
+// 	var body = _.pick(req.body, ' chapter', 'hanzi', );
+	 
+
+// 	db.wordzh.create(body).then(function(wordzh){
+// 		res.json(wordzh.toJSON());
+// 	}, function(e){
+// 		res.status(400).json(e);
+// 	});
+// });
+
+
+
 
 //GET/ WORDS
 //this query will give access to the whole DB, turning the app in a dictionary such as pleco.
@@ -79,7 +111,7 @@ app.get('/todos/:id', middleware.requireAuthentication, function(req, res) {
 
 
 // POST /todos
-// this will aloud the user to create new sentences. 
+// to convert the json file in a sqlite db and upload all the datas 
 app.post('/todos', middleware.requireAuthentication, function(req, res) {
 	var body = _.pick(req.body, 'description', 'completed');
 
