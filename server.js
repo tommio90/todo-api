@@ -35,16 +35,27 @@ app.post('/wordzh', function(req,res){
 
 //POST/wordbook
 
-// app.post('/woordbook', function(req,res){
-// 	var body = _.pick(req.body, ' chapter', 'hanzi', );
+app.post('/wordbook', function(req,res){
+	var body = _.pick(req.body, 'chapter', 'hanzi');
 	 
+	 console.log(body.hanzi);
 
-// 	db.wordzh.create(body).then(function(wordzh){
-// 		res.json(wordzh.toJSON());
-// 	}, function(e){
-// 		res.status(400).json(e);
-// 	});
-// });
+	 translate(body.hanzi).then(function (text) {
+				console.log(text);
+				text.chapter = body.chapter;
+			    db.wordbook.create(text).then(function(wordbook){
+				res.json(wordbook.toJSON());
+			}, function(e){
+				res.status(400).json(e);
+			});
+		
+	
+			}).catch(function (error) {
+				console.log(error);
+			});
+
+
+});
 
 
 

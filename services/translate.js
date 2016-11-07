@@ -20,13 +20,15 @@ module.exports = function (translation) {
         var hanziString = JSON.stringify(body.translation);
          if(hasChinese(hanziString)){
             var sound = pinyin(hanziString);
-            resolve('Translation: ' + body.translation + '  Pinyin: '+ sound );
+            resolve('Translation is: ' + body.translation + '  Pinyin: '+ sound );
         
          }else{
           
            var hanziString = JSON.stringify(body.query);
            var sound = pinyin(hanziString);
-           resolve('Translation: ' + body.translation + '  Pinyin: '+ sound +'  ' );
+		   var traduzione = JSON.stringify(body.translation);
+		   var word ={hanzi: body.query, pinyin: sound, translation: traduzione };
+           resolve(word);
          }
 			}
 		});
