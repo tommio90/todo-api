@@ -57,6 +57,15 @@ app.post('/wordbook', function(req,res){
 
 });
 
+//GET/wordbook
+app.get('/wordbook', function(req,res){
+	
+	db.wordbook.findAll({}).then(function(word){
+		res.json(word);
+	})
+	
+})
+
 
 
 
