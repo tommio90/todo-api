@@ -27,7 +27,7 @@ module.exports = function (translation) {
            var hanziString = JSON.stringify(body.query);
            var sound = pinyin(hanziString);
 		   var traduzione = JSON.stringify(body.translation);
-		   var word ={hanzi: body.query, pinyin: sound, translation: traduzione };
+		   var word ={hanzi: body.query, pinyin_tone: sound, translation: traduzione };
            resolve(word);
          }
 			}

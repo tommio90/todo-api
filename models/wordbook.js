@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
 	return sequelize.define('wordbook', {
 		
-			chapter: {
+		hsk: {
 			type: DataTypes.INTEGER,
 			allowNull: true,
 			
@@ -24,11 +24,11 @@ module.exports = function(sequelize, DataTypes) {
 			
 		},
 
-		translation: {
+		meaning: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
-				len: [1, 25]
+				len: [1, 600]
 			}
 			
 		}

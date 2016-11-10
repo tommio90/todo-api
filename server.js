@@ -3,6 +3,8 @@ var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./db.js');
 var bcrypt = require('bcrypt');
+var fs = require('fs');
+var asyncLoop = require('node-async-loop');
 var middleware = require('./middleware.js')(db);
 
 var translate = require('./services/translate.js');
@@ -12,14 +14,98 @@ var todos = [];
 var todoNextId = 1;
 
 
+app.use(function(req, res, next){
+	res.header('Access-Control-Allow-Origin', "*");
+	res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+	res.header('Access-Control-Allow-Headers', 'Content-Type');
+	next();
+})
+
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
 	res.send('Todo API Root');
 });
 
+//POST/worddb
 
 
+app.post('/worddb', function(req,res){
+	
+	asyncLoop(req.body, function (item, next)
+	{
+		var body = _.pick(item, 'spelling', 'length', 'pinyin_input', 'Wmillion', 'dominant_pos');
+	
+		console.log("object is " + body.spelling);
+
+
+		translate(body.spelling).then(function (text) {
+					console.log(text);
+					text.spelling = body.spelling;
+					text.length = body.length;
+					text.pinyin_input = body.pinyin_input;
+					text.Wmillion = body.Wmillion;
+					text.dominant_pos = body.dominant_pos;
+					db.worddb.create(text).then(function(wordbook){
+					res.json(wordbook.toJSON());
+					next();
+					
+				}, function(e){
+					res.status(400).json(e);
+				});
+			
+		
+				}).catch(function (error) {
+					console.log(error);
+				});
+		
+
+		
+	}, function ()
+	{
+		console.log('Finished!');
+	});
+	 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+//  for(object in req.body){
+
+// 	 console.log('number is' +object);
+   
+//     var body = _.pick(req.body[object], 'spelling', 'length', 'pinyin_input', 'Wmillion', 'dominant_pos');
+	
+// 	console.log("object is " + body.spelling);
+
+
+// 	 translate(body.spelling).then(function (text) {
+// 				console.log(text);
+// 				text.spelling = body.spelling;
+// 				text.length = body.length;
+// 				text.pinyin_input = body.pinyin_input;
+// 				text.Wmillion = body.Wmillion;
+// 				text.dominant_pos = body.dominant_pos;
+// 			    db.worddb.create(text).then(function(wordbook){
+// 				res.json(wordbook.toJSON());
+// 			}, function(e){
+// 				res.status(400).json(e);
+// 			});
+		
+	
+// 			}).catch(function (error) {
+// 				console.log(error);
+// 			});
+			
+// 	 }
+});
 
 //POST/wordzh
 //this method aloud the creation of a database starting from json file I input
@@ -38,7 +124,7 @@ app.post('/wordzh', function(req,res){
 app.post('/wordbook', function(req,res){
 	var body = _.pick(req.body, 'chapter', 'hanzi');
 	 
-	 console.log(body.hanzi);
+	//  console.log(body.hanzi);
 
 	 translate(body.hanzi).then(function (text) {
 				console.log(text);
@@ -57,12 +143,30 @@ app.post('/wordbook', function(req,res){
 
 });
 
-//GET/wordbook
-app.get('/wordbook', function(req,res){
-	
-	db.wordbook.findAll({}).then(function(word){
+//GET/worddb
+app.get('/worddb', function(req,res){
+	var query = req.query;
+	var where ={
+
+	};
+
+		if (query.hasOwnProperty('q') && query.q.length > 0) {
+		where.spelling = {
+			$like: '%' + query.q + '%'
+		};
+
+		if (query.hasOwnProperty('chapter') && query.chapter.length > 0) {
+			where.chapter = query.chapter;
+		};
+	}
+
+	db.worddb.findAll({
+		where:where
+	}).then(function(word){
 		res.json(word);
-	})
+	}, function(e) {
+		res.status(500).send();
+	});
 	
 })
 
@@ -244,8 +348,105 @@ app.delete('/users/login', middleware.requireAuthentication, function (req, res)
 	});
 });
 
-db.sequelize.sync({force: true}).then(function() {
+
+
+db.sequelize.sync(
+	//{force:true}
+	).then(function() {
 	app.listen(PORT, function() {
 		console.log('Express listening on port ' + PORT + '!');
+
 	});
+
+//implement the hsk database
+
+// fs.readFile('hsk_1.json', 'utf8', function (err, data) {
+//   if (err) throw err;
+//   obj = JSON.parse(data);
+//  // console.log(obj);
+
+// asyncLoop(obj, function (item, next) {
+// 		var body = _.pick(item, 'hsk', 'hanzi', 'pinyin', 'meaning');
+		
+// 		//console.log("object is " + );
+		
+
+// 		db.wordbook.create(item);
+		
+// 			next();
+		
+// 	}, function ()
+// 	{
+// 		console.log('Finished!');
+// 	});
+// 	});
+
+
+// //finish hsk
+			
+			
+
+
+//implement the database
+
+// fs.readFile('db_2.json', 'utf8', function (err, data) {
+//   if (err) throw err;
+//   obj = JSON.parse(data);
+//   console.log(obj);
+
+// asyncLoop(obj, function (item, next)
+// 	{
+// 		var hsk_test = false;
+// 		var body = _.pick(item, 'spelling', 'length','pinyin', 'pinyin_input', 'Wmillion', 'dominant_pos');
+	
+// 		console.log("object is " + body.spelling);
+
+// 	db.wordbook.findOne({
+// 			where: {
+// 				hanzi : body.spelling
+// 			}
+// 		}).then(function(hsko) {
+			
+			
+			
+// 				translate(body.spelling).then(function (text) {
+// 							console.log(text);
+// 							if(hsko){ 
+// 								text.translation = hsko.meaning;
+// 								text.hsk = hsko.hsk;
+// 							}else{
+// 								text.hsk = 0;
+// 							}
+// 							text.spelling = body.spelling;
+// 							text.length = body.length;	
+										
+// 							text.pinyin=  body.pinyin;
+// 							text.pinyin_input = body.pinyin_input;
+// 							text.Wmillion = body.Wmillion;
+// 							text.dominant_pos = body.dominant_pos;
+// 							db.worddb.create(text);
+							
+// 							console.log(text);
+							
+					
+				
+// 						}).catch(function (error) {
+// 							console.log(error);
+// 						});
+// 				});
+//         next();
+		
+// 	}, function ()
+// 	{
+// 		console.log('Finished!');
+// 	});
+// 	});
+
+
+
+
+
+//finish database code
+
+	
 });
