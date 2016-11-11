@@ -389,7 +389,7 @@ db.sequelize.sync(
 
 //implement the database
 
-// fs.readFile('db_2.json', 'utf8', function (err, data) {
+// fs.readFile('db_3.json', 'utf8', function (err, data) {
 //   if (err) throw err;
 //   obj = JSON.parse(data);
 //   console.log(obj);
