@@ -4,15 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^0.8.5",
+    "bcrypt": "^0.8.7",
     "body-parser": "^1.13.3",
+    "chinese-to-pinyin": "^0.1.6",
     "crypto-js": "^3.1.5",
-    "express": "^4.13.3",
+    "express": "^4.14.0",
     "has-chinese": "^0.1.0",
     "is-chinese": "^1.2.5",
     "jsonwebtoken": "^7.1.9",
@@ -23,5 +25,14 @@
     "sequelize": "^3.5.1",
     "sqlite3": "^3.0.10",
     "underscore": "^1.8.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tommio90/todo-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tommio90/todo-api/issues"
+  },
+  "homepage": "https://github.com/tommio90/todo-api#readme"
 }

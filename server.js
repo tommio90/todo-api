@@ -6,10 +6,10 @@ var bcrypt = require('bcrypt');
 var fs = require('fs');
 var asyncLoop = require('node-async-loop');
 var middleware = require('./middleware.js')(db);
-
+var ischinese = require('is-chinese');
 var translate = require('./services/translate.js');
 var app = express();
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3003;
 var todos = [];
 var todoNextId = 1;
 
@@ -150,25 +150,45 @@ app.get('/worddb', function(req,res){
 
 	};
 
-		if (query.hasOwnProperty('q') && query.q.length > 0) {
-		where.spelling = {
-			$like: '%' + query.q + '%'
-		};
+	
+		if (query.hasOwnProperty('qu') && query.qu.length > 0) {
+			if(!ischinese(query.qu)){
+				
 
-		if (query.hasOwnProperty('chapter') && query.chapter.length > 0) {
-			where.chapter = query.chapter;
-		};
-	}
+				where.pinyin_input = {
+				$like: '%' + query.qu + '%'
+				};
+			}else{
+			
+				where.spelling = {
+				$like: '%' + query.qu + '%'
+				};
+			}
+			
+		}
 
-	db.worddb.findAll({
+		
+
+		if ( query.qu === '' ) {
+		
+			where.pinyin = {
+				$like: '%kk%'
+				};
+		}
+	
+	db.word_test.findAll({
 		where:where
 	}).then(function(word){
 		res.json(word);
+
+
+
 	}, function(e) {
 		res.status(500).send();
 	});
+		
 	
-})
+});
 
 
 
@@ -389,7 +409,7 @@ db.sequelize.sync(
 
 //implement the database
 
-// fs.readFile('db_3.json', 'utf8', function (err, data) {
+// fs.readFile('db_1.json', 'utf8', function (err, data) {
 //   if (err) throw err;
 //   obj = JSON.parse(data);
 //   console.log(obj);
@@ -419,8 +439,8 @@ db.sequelize.sync(
 // 							}
 // 							text.spelling = body.spelling;
 // 							text.length = body.length;	
-										
-// 							text.pinyin=  body.pinyin;
+// 							//var numberPin = body.pinyin.match(/\d+/g)				
+// 							text.pinyin= body.pinyin;
 // 							text.pinyin_input = body.pinyin_input;
 // 							text.Wmillion = body.Wmillion;
 // 							text.dominant_pos = body.dominant_pos;
@@ -447,6 +467,29 @@ db.sequelize.sync(
 
 
 //finish database code
+
+//test DB
+
+
+// fs.readFile('db_2.json', 'utf8', function (err, data) {
+//   if (err) throw err;
+//   obj = JSON.parse(data);
+//   console.log(obj);
+
+// asyncLoop(obj, function (item, next)
+// 	{
+		
+// 		var body = _.pick(item, 'spelling', 'length','pinyin', 'pinyin_input', 'Wmillion', 'dominant_pos');
+// 		db.word_test.create(body);
+//         next();
+		
+// 	}, function ()
+// 	{
+// 		console.log('Finished!');
+// 	});
+// 	});
+
+//finish test DB
 
 	
 });

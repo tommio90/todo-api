@@ -14,6 +14,7 @@ if(env === 'production'){
     });
 }
 var db = {};
+db.word_test = sequelize.import(__dirname + '/models/word_test.js');
 db.worddb = sequelize.import(__dirname + '/models/worddb.js');
 db.wordbook = sequelize.import(__dirname + '/models/wordbook.js');
 db.wordzh = sequelize.import(__dirname + '/models/wordzh.js');

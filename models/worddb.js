@@ -12,14 +12,14 @@ module.exports = function(sequelize, DataTypes) {
 		},
         translation: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: true,
 			validate: {
 				len: [1, 600]
 			}
 		},
 	    length: {
 			type: DataTypes.INTEGER,
-			allowNull: false,
+			allowNull: true,
 			
 		},
         hsk: {
@@ -30,21 +30,21 @@ module.exports = function(sequelize, DataTypes) {
 		
 		pinyin_tone: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: true,
 			validate: {
 				len: [1, 40]
 			}
 		},
         pinyin: {
 			type: DataTypes.INTEGER,
-			allowNull: false,
+			allowNull: true,
 			
 		},
 
 
         pinyin_input: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: true,
 			validate: {
 				len: [1, 40]
 			}
@@ -52,7 +52,7 @@ module.exports = function(sequelize, DataTypes) {
 
         Wmillion: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: true,
 			validate: {
 				len: [1, 40]
 			}
