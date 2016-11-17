@@ -16,13 +16,14 @@ if(env === 'production'){
 
 });
 
-console.log( process.env);
+console.log( "frociuz" +process.env);
 }else{
 
     sequelize = new Sequelize(undefined, undefined, undefined, {
         'dialect':'sqlite',
         'storage': __dirname  + '/data/dev-todo-api.sqlite'
     });
+    console.log( "fociooo"+process.env);
 }
 var db = {};
 db.word_test = sequelize.import(__dirname + '/models/word_test.js');
