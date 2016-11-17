@@ -11,14 +11,12 @@ var database = process.env.RSD_DB_NAME;
 if(env === 'production'){
     sequelize = new Sequelize(database, user, password, {
         host: host,
-        dialect: 'postgres',
+        dialect: 'postgres'
 
 
 });
 
-
-
-
+console.log( process.env);
 }else{
 
     sequelize = new Sequelize(undefined, undefined, undefined, {
