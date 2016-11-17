@@ -176,7 +176,7 @@ app.get('/worddb', function(req,res){
 				};
 		}
 	
-	db.word_test.findAll({
+	db.worddb.findAll({
 		where:where
 	}).then(function(word){
 		res.json(word);

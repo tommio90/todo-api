@@ -1,10 +1,23 @@
 var Sequelize = require('sequelize');
 var env = process.env.NODE_ENV || 'development';
 var sequelize;
+
+var host = process.env.RDS_HOSTNAME;
+var user = process.env.RDS_USERNAME;
+var password = process.env.RDS_PASSWORD;
+var port  =process.env.RDS_PORT;
+var database = process.env.RSD_DB_NAME;
+
 if(env === 'production'){
-    sequelize = new Sequelize(process.env.DATABASE_URL, {
-        'dialect':'postgres'
-    });
+    sequelize = new Sequelize(database, user, password, {
+        host: host,
+        dialect: 'postgres',
+
+
+});
+
+
+
 
 }else{
 
