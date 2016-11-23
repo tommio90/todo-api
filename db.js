@@ -9,21 +9,18 @@ var port  =process.env.RDS_PORT;
 var database = process.env.RSD_DB_NAME;
 
 if(env === 'production'){
-    sequelize = new Sequelize(database, user, password, {
+     sequelize = new Sequelize('database', 'username', 'password', {
         host: host,
-        dialect: 'postgres'
-
-
+        port: port
 });
-
-console.log( "frociuz" +process.env);
+    console.log( "frociuz" +process.env);
 }else{
 
     sequelize = new Sequelize(undefined, undefined, undefined, {
         'dialect':'sqlite',
         'storage': __dirname  + '/data/dev-todo-api.sqlite'
     });
-    console.log( "fociooo"+process.env);
+    console.log( "fociooo"+process.env.NODE_ENV);
 }
 var db = {};
 db.word_test = sequelize.import(__dirname + '/models/word_test.js');

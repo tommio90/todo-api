@@ -176,7 +176,7 @@ app.get('/worddb', function(req,res){
 				};
 		}
 	
-	db.worddb.findAll({
+	db.word_test.findAll({
 		where:where
 	}).then(function(word){
 		res.json(word);
@@ -353,7 +353,7 @@ app.post('/users/login', function (req, res) {
 			token: token
 		});
 	}).then(function (tokenInstance) {
-		res.header('Auth', tokenInstance.get('token')).json(userInstance.toPublicJSON());
+		res.header('frocio', tokenInstance.get('token')).json(userInstance.toPublicJSON());
 	}).catch(function () {
 		res.status(401).send();
 	});
@@ -471,7 +471,7 @@ db.sequelize.sync(
 //test DB
 
 
-// fs.readFile('db_2.json', 'utf8', function (err, data) {
+// fs.readFile('./database/db_1.json', 'utf8', function (err, data) {
 //   if (err) throw err;
 //   obj = JSON.parse(data);
 //   console.log(obj);
