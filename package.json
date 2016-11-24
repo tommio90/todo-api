@@ -19,6 +19,7 @@
     "is-chinese": "^1.2.5",
     "jsonwebtoken": "^7.1.9",
     "mini-pinyin": "0.0.2",
+    "mysql": "^2.12.0",
     "node-async-loop": "^1.2.2",
     "pg": "^4.4.1",
     "pg-hstore": "^2.3.2",

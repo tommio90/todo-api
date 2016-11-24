@@ -8,20 +8,19 @@ var password = process.env.RDS_PASSWORD;
 var port  =process.env.RDS_PORT;
 var database = process.env.RSD_DB_NAME;
 
-if(env === 'production'){
-     sequelize = new Sequelize('database', 'username', 'password', {
-        host: host,
-        port: port
+// if(env === 'production'){
+     sequelize = new Sequelize('Edugora', 'root', 'messenger', {
+        host: "localhost",
+        port: 3306
 });
-    console.log( "frociuz" +process.env);
-}else{
+// }else{
 
-    sequelize = new Sequelize(undefined, undefined, undefined, {
-        'dialect':'sqlite',
-        'storage': __dirname  + '/data/dev-todo-api.sqlite'
-    });
-    console.log( "fociooo"+process.env.NODE_ENV);
-}
+//     sequelize = new Sequelize(undefined, undefined, undefined, {
+//         'dialect':'sqlite',
+//         'storage': __dirname  + '/data/dev-todo-api.sqlite'
+//     });
+ 
+// }
 var db = {};
 db.word_test = sequelize.import(__dirname + '/models/word_test.js');
 db.worddb = sequelize.import(__dirname + '/models/worddb.js');
