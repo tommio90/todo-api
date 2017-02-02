@@ -12,6 +12,7 @@
   "dependencies": {
     "bcrypt": "^0.8.7",
     "body-parser": "^1.13.3",
+    "chinese-conv": "^1.0.1",
     "chinese-to-pinyin": "^0.1.6",
     "crypto-js": "^3.1.5",
     "express": "^4.14.0",
@@ -19,7 +20,7 @@
     "is-chinese": "^1.2.5",
     "jsonwebtoken": "^7.1.9",
     "mini-pinyin": "0.0.2",
-    "mysql": "^2.12.0",
+    "mysql": "^2.13.0",
     "node-async-loop": "^1.2.2",
     "pg": "^4.4.1",
     "pg-hstore": "^2.3.2",
