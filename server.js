@@ -12,6 +12,9 @@ var middleware = require('./middleware.js')(db);
 var ischinese = require('is-chinese');
 var pinyin = require("chinese-to-pinyin");
 var chineseConv = require('chinese-conv');
+var hanzi = require("hanzi");
+
+hanzi.start();
 
 var translate = require('./services/translate.js');
 var app = express();
@@ -378,8 +381,6 @@ app.get('/uok', function(req,res){
 	
 		if (query.hasOwnProperty('qu') && query.qu.length > 0) {
 			if(!ischinese(query.qu)){
-				
-				
 				where.pinyin_input = {
 				$like: '%' + query.qu + '%'
 				};
@@ -392,19 +393,13 @@ app.get('/uok', function(req,res){
 				};
 
 				console.log('if  :'+where);
-			}
-			
+			}	
 		}
-
-	
-
 		if (query.qu === '' ) {
 			where.simplified={
 				$like: 'frociodimerdaaaaaaaaa'
 			}
-
 		}
-			
 			db.units.findAll({
 				where:where,
 				limit : 10
@@ -515,7 +510,7 @@ app.get('/convert', function(req,res){
 //GET/ conversion sentence  to sequelize
 app.get('/convertsentence', function(req,res){
 //37779
-		connection.query('SELECT * FROM `Done` WHERE `chinese_id` BETWEEN 1 AND 1898544'
+		connection.query('SELECT * FROM `Done` WHERE `chinese_id` BETWEEN 1 AND 3'
 		// connection.query('SELECT * FROM `cedict1` WHERE `simplified`='+query+''
 		, function(err, rows, fields) {
 		if (err) throw err;
