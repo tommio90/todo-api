@@ -4,6 +4,7 @@ var _ = require('underscore');
 var db = require('./db.js');
 var connection = require('./sql.js');
 
+
 var bcrypt = require('bcrypt');
 var fs = require('fs');
 var asyncLoop = require('node-async-loop');
@@ -11,6 +12,7 @@ var middleware = require('./middleware.js')(db);
 var ischinese = require('is-chinese');
 var pinyin = require("chinese-to-pinyin");
 var chineseConv = require('chinese-conv');
+
 var translate = require('./services/translate.js');
 var app = express();
 var PORT = process.env.PORT || 8080;
@@ -32,194 +34,339 @@ app.get('/', function(req, res) {
 });
 
 
-//GET/mywords
+//OLD SQL CODE
+//COURSE
 
-app.get('/mywords', function(req, res){
-	var where ={};
-	
 
-	 	// where.user_id = {
-		// 		$like:  1
-		// 		};
-	
-		db.mywords.findAll({
-				where:where
-			}).then(function(word){
-				var cart = [];
-				var count =1;
-				
-				var numbe = parseInt(word.length);
-				
-				asyncLoop(word, function (item, next){
-				//word[].uok_id
-				//console.log(item.uok_id);
-				 	where.uok_id = {
-				$like:  item.uok_id
-				};
-				
-				db.uok.findOne({
-				where:where
-				}).then(function(text){
-					// var uokks = JSON.stringify(uokk);
-					// uword.push(uokks);
-					text.notes = item.notes;
-					var element = {};
-					element.notes= text.notes;
-					element.simplified = text.simplified;
-					element.pinyin_visual = text.pinyin_visual;
-					element.Wmillion = text.Wmillion;
-					element.dominant_pos = text.dominant_pos;
-					
+//POST//create courses
 
-					cart.push(element);
-					console.log(count);
-					console.log(numbe);
-					if(count === numbe){
-						console.log('we are inside the count function');
-						//res.json(cart);
-						console.log(cart);
-						//var obj = JSON.parse(cart);
-						res.json(cart);
-					}
+app.post('/course', function(req,res){
 
-					count ++;
-				
-				});
-			
-				console.log(count);
-			
-				
-				next();
-				
-				
-	             });
+    console.log(req.body.corso);
+var body = _.pick(req.body.corso, 'school' ,'text_book', 'teacher', 'course_objective');
+	console.log(body.school);
+     
+     var schoolez = JSON.stringify(body.school);
+     var text_bookez = JSON.stringify(body.text_book);
+     var teacherez = JSON.stringify(body.teacher);
+     var course_objectiveez = JSON.stringify(body.course_objective);
+     var date = JSON.stringify(moment().format('MMMM Do YYYY, h:mm:ss a'));
+     var id = 2;
 
-				 
-				
-			});
+     console.log(date);
+     
+
+     
+
+
+      connection.query('INSERT INTO 1_course (date, user_id, school, text_book, teacher,  course_objective)VALUES ('+date+','+id+', '+schoolez+', '+text_bookez+', '+teacherez+', '+course_objectiveez+')'
+			, function(err, rows, fields) {
+			if (err) throw err;
+      console.log(rows);
+       res.json('200')
+    
+		});
+
 });
 
-//POST/mywords
+//GET/ course
 
-app.post('/mywords', function (req, res) {
-	var body = _.pick(req.body, 'uok_id', 'notes');
-	body.user_id = 1;
-	body.lesson_number = 1;
-	console.log(body)
+app.get('/courses', function(req, res){
+    
 
-	db.mywords.create(body).then(function (myword) {
-		res.json(myword);
-	}, function (e) {
-		res.status(400).json(e);
-	});
+
+    connection.query('SELECT * from 1_course WHERE user_id = 1 '
+        , function(err,rows, fields){
+            if(err) throw err;
+            res.json(rows);
+        });
+
 });
 
-// app.post('/mywords', function(req, res) {
-// 	var body = _.pick(req.body, 'uok_id');
 
-// 	db.todo.create(body).then(function(todo) {
-// 		req.user.addTodo(todo).then(function () {
-// 			return todo.reload();
-// 		}).then(function (todo) {
-// 			res.json(todo.toJSON());
+//LESSONS
+
+//POST lesson
+
+app.post('/lesson', function(req,res){
+   
+    var body = _.pick(req.body.lezion.lezione, 'chapter_number' , 'lesson_objective', 'lesson_skill',  'topic');
+    var bod = _.pick(req.body.lezion, 'ok' );
+	console.log(bod);
+     
+     //var reviewez = JSON.stringify(body.review);
+     var lesson_objectiveez = JSON.stringify(body.lesson_objective);
+     var lesson_skillez = JSON.stringify(body.lesson_skill);
+     var topicez= JSON.stringify(body.topic);
+     var date = JSON.stringify(moment().format('MMMM Do YYYY, h:mm:ss a'));
+     var user_id = 2;
+     var course_id = parseInt(bod.ok);
+     console.log(course_id);
+
+      connection.query('INSERT INTO 1_lesson (date, user_id, course_id, chapter_number, lesson_objective, lesson_skill,  topic) VALUES ('+date+', '+user_id+', '+course_id+', '+body.chapter_number+', '+lesson_objectiveez+', '+lesson_skillez+',  '+topicez+')'
+			, function(err, rows, fields) {
+			if (err) throw err;
+      console.log(rows);
+       res.json('200')
+    
+		});
+
+});
+
+//GET//LESSONS
+
+app.get('/lessons', function(req, res){
+
+var query = parseInt(req.query.q);
+
+
+
+    connection.query('SELECT * from 1_lesson WHERE course_id ='+query+' '
+        , function(err,rows, fields){
+            if(err) throw err;
+            res.json(rows);
+        });
+
+});
+
+
+//NOTES
+
+//POST//NOTES
+
+app.post('/note', function(req,res){
+var body = _.pick(req.body, 'grammar_point' , 'note');
+	console.log(body);
+     
+     //var reviewez = JSON.stringify(body.review);
+     var noteez = JSON.stringify(body.note);
+
+     var user_id = 2;
+     var course_id = 6;
+     var lesson_id = 4;
+     
+      connection.query('INSERT INTO 1_notes (lesson_id, user_id, course_id,  grammar_point, note) VALUES ('+lesson_id+', '+user_id+', '+course_id+', '+body.grammar_point+', '+noteez+')'
+			, function(err, rows, fields) {
+			if (err) throw err;
+      console.log(rows);
+       res.json('200')
+    
+		});
+
+});
+
+
+//GET//NOTES
+
+app.get('/notes', function(req, res){
+
+
+    connection.query('SELECT * from 1_notes WHERE user_id = 2 AND lesson_id = 4 ' 
+        , function(err,rows, fields){
+            if(err) throw err;
+            res.json(rows);
+        });
+
+});
+
+
+// //BASE
+
+// //POST//
+// // WORDS type:1
+// // NOTES type:2
+// // GRAMMAR POINTS type:3
+// // SENTENCES  type:4
+// // DIALOGUES type:5
+
+// app.post('/base', function(req,res){
+// var body = _.pick(req.body.items, 'word_id' , 'core', 'note', 'lezione_id', 'type');
+	
+    
+//      //var reviewez = JSON.stringify(body.review);
+//      var noteez = JSON.stringify(body.note);
+
+//      var user_id = 2;
+     
+//      var lesson_id = parseInt(body.lezione_id);
+//      var type = parseInt(body.type);
+
+//      if (body.core === true){
+//          var coreNumber = 1;
+//      }
+//        if (body.core === false){
+//          var coreNumber = 0;
+//      }
+
+//    var put = {};
+
+//    put.lesson_id = lesson_id;
+//    put.user_id = user_id;
+  
+//    put.uok_id = body.word_id;
+//    put.core = coreNumber;
+//    put.note = noteez;
+//    put.type = type;
+  
+//    var where;
+//    var here;
+//    if(type = 1){
+//        where = 'uok_id';
+//        here = put.uok_id;
+//    }
+   
+
+//    db.base.create(put).then(function(put) {
+		
+// 			res.json(200);
 // 		});
 // 	}, function(e) {
 // 		res.status(400).json(e);
-// 	});
+
+
+//     //  connection.query('SELECT time_creation FROM base WHERE uok_id ='+here+' AND lesson_id = '+put.lesson_id+' '  
+//     //     , function(err,response, fields){
+//     //         if(err) throw err;
+//     //      console.log(response);
+//     //      console.log(response.length);
+  
+//     //       if (response.length >0){
+//     //           res.json('present')
+              
+
+              
+//     //         }else{
+              
+//     //     connection.query('INSERT INTO base (lesson_id, user_id, uok_id, core, note, type) VALUES ('+put.lesson_id+', '+put.user_id+',  '+put.uok_id+', '+put.core+', '+put.note+', '+put.type+')'
+// 	// 		, function(err, rows, fields) {
+// 	// 		if (err) throw err;
+//     //         console.log(rows);
+//     //         res.json('200')
+    
+// 	// 	});
+        
+        
+//     //         }
+
+
+//     //     });
+
+        
+     
+     
+
+
 // });
+//BASE
 
-//POST/worddb
+//POST//
+// WORDS type:1
+// NOTES type:2
+// GRAMMAR POINTS type:3
+// SENTENCES  type:4
+// DIALOGUES type:5
 
-
-app.post('/worddb', function(req,res){
+app.post('/base', function(req,res){
+var body = _.pick(req.body.items, 'word_id' , 'core', 'note', 'lezione_id', 'type');
 	
-	asyncLoop(req.body, function (item, next)
-	{
-		var body = _.pick(item, 'spelling', 'length', 'pinyin_input', 'Wmillion', 'dominant_pos');
-	
-		console.log("object is " + body.spelling);
+    
+     //var reviewez = JSON.stringify(body.review);
+     var noteez = JSON.stringify(body.note);
 
+     var user_id = 2;
+     
+     var lesson_id = parseInt(body.lezione_id);
+     var type = parseInt(body.type);
 
-		translate(body.spelling).then(function (text) {
-					console.log(text);
-					text.spelling = body.spelling;
-					text.length = body.length;
-					text.pinyin_input = body.pinyin_input;
-					text.Wmillion = body.Wmillion;
-					text.dominant_pos = body.dominant_pos;
-					db.worddb.create(text).then(function(wordbook){
-					res.json(wordbook.toJSON());
-					next();
-					
-				}, function(e){
-					res.status(400).json(e);
-				});
-			
-		
-				}).catch(function (error) {
-					console.log(error);
-				});
-		
+     if (body.core === true){
+         var coreNumber = 1;
+     }
+       if (body.core === false){
+         var coreNumber = 0;
+     }
 
-		
-	}, function ()
-	{
-		console.log('Finished!');
-	});
-	 
+   var put = {};
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-//  for(object in req.body){
-
-// 	 console.log('number is' +object);
+   put.lesson_id = lesson_id;
+   put.user_id = user_id;
+  
+   put.uok_id = body.word_id;
+   put.core = coreNumber;
+   put.note = noteez;
+   put.type = type;
+   var where;
+   var here;
+  
    
-//     var body = _.pick(req.body[object], 'spelling', 'length', 'pinyin_input', 'Wmillion', 'dominant_pos');
-	
-// 	console.log("object is " + body.spelling);
 
 
-// 	 translate(body.spelling).then(function (text) {
-// 				console.log(text);
-// 				text.spelling = body.spelling;
-// 				text.length = body.length;
-// 				text.pinyin_input = body.pinyin_input;
-// 				text.Wmillion = body.Wmillion;
-// 				text.dominant_pos = body.dominant_pos;
-// 			    db.worddb.create(text).then(function(wordbook){
-// 				res.json(wordbook.toJSON());
-// 			}, function(e){
-// 				res.status(400).json(e);
-// 			});
+     connection.query('SELECT time_creation FROM base WHERE uok_id = '+put.uok_id+' AND lesson_id = '+put.lesson_id+' '  
+        , function(err,response, fields){
+            if(err) throw err;
+         console.log(response);
+         console.log(response.length);
+  
+          if (response.length >0){
+              res.json('present')
+              
+
+              
+            }else{
+              
+        connection.query('INSERT INTO base (lesson_id, user_id, uok_id, core, note, type) VALUES ('+put.lesson_id+', '+put.user_id+',  '+put.uok_id+', '+put.core+', '+put.note+', '+put.type+')'
+			, function(err, rows, fields) {
+			if (err) throw err;
+            console.log(rows);
+            res.json('200')
+    
+		});
+        
+        
+            }
+
+
+        });
+
+        
+     
+     
+
+
+});
+
+//GET//BASE-ITEMS // 
+
+app.get('/items', function(req, res){
+var query = JSON.stringify(''+req.query.qu+'');
+
+
+	// db.base.findAll({
+	// 	lesson_id: query,
+	// 	include: 
+	// 		[{model: units, required: true}]
 		
-	
-// 			}).catch(function (error) {
-// 				console.log(error);
-// 			});
-			
-// 	 }
+	// }).then(function(todo) {
+	// 	res.json(todo)
+
+		
+	// }, function(e) {
+	// 	res.status(500).send();
+	// });
+
+    connection.query('SELECT * from units INNER join base on units.id = base.uok_id where base.lesson_id ='+query+' ' 
+        , function(err,rows, fields){
+            if(err) throw err;
+            res.json(rows);
+        });
+
 });
 
-//POST/wordzh
-//this method aloud the creation of a database starting from json file I input
-app.post('/wordzh', function(req,res){
-	var body = _.pick(req.body, 'hsk' ,'hanzi', 'pinyin', 'meaning');
-	console.log(body);
-	db.wordzh.create(body).then(function(wordzh){
-		res.json(wordzh.toJSON());
-	}, function(e){
-		res.status(400).json(e);
-	});
-});
 
+
+
+
+
+//END SQL
 
 //GET/uoks
 app.get('/uok', function(req,res){
@@ -233,8 +380,8 @@ app.get('/uok', function(req,res){
 			if(!ischinese(query.qu)){
 				
 				
-				where.pinyin_visual = {
-				$like:  query.qu 
+				where.pinyin_input = {
+				$like: '%' + query.qu + '%'
 				};
 
 				console.log('if  :'+where);
@@ -249,7 +396,7 @@ app.get('/uok', function(req,res){
 			
 		}
 
-		
+	
 
 		if (query.qu === '' ) {
 			where.simplified={
@@ -259,7 +406,9 @@ app.get('/uok', function(req,res){
 		}
 			
 			db.units.findAll({
-				where:where
+				where:where,
+				limit : 10
+
 			}).then(function(word){
 				res.json(word);
 			});
@@ -294,10 +443,6 @@ app.get('/sentence', function(req,res){
 			}
 			}
 			
-	
-
-		
-
 		if (query.qu === '' ) {
 			where.chinese_sent={
 				$like: 'frociodimerdaaaaaaaaa'
@@ -306,7 +451,8 @@ app.get('/sentence', function(req,res){
 		}
 			
 			db.sentence.findAll({
-				where:where
+				where:where,
+				limit: 10
 			}).then(function(word){
 				res.json(word);
 			});
@@ -330,7 +476,7 @@ db.user.addUok_relationship(db.many_to_manies, { notes: 'started' });
 //GET/ conversion to sequelize
 app.get('/convert', function(req,res){
 
-		connection.query('SELECT * FROM `ced` WHERE `word_id` BETWEEN 15000 AND 17747'
+		connection.query('SELECT * FROM `units` WHERE `id` BETWEEN 20001 AND 20870'
 		// connection.query('SELECT * FROM `cedict1` WHERE `simplified`='+query+''
 		, function(err, rows, fields) {
 		if (err) throw err;
@@ -342,29 +488,34 @@ app.get('/convert', function(req,res){
 		// res.json(rows);
 		console.log('the first obj: '+ testj[0].simplified);
 
-		asyncLoop(testj, function (item, next){
-			console.log('the first obj: '+ item.simplified);
-			db.cedict.create(item);
-							// db.cedict1.findOrCreate(item);
-					//  		 .spread(function(cedict, created) {
-					//   			  console.log(cedict.get({
-					//      	 plain: true
-					//     }))
-					//     console.log(created)
+
+		testj.forEach(function(item){
+				db.units.create(item);
+			});
+
+		// asyncLoop(testj, function (item, next){
+		// 	console.log('the first obj: '+ item.simplified);
+		// 	db.units.create(item);
+		// 					// db.cedict1.findOrCreate(item);
+		// 			//  		 .spread(function(cedict, created) {
+		// 			//   			  console.log(cedict.get({
+		// 			//      	 plain: true
+		// 			//     }))
+		// 			//     console.log(created)
 
 						
-					//  })
-			next();
-		},function(){
+		// 			//  })
+		// 	next();
+		// },function(){
 
-		});
+		// });
 		});
 });
 
 //GET/ conversion sentence  to sequelize
 app.get('/convertsentence', function(req,res){
-
-		connection.query('SELECT * FROM `Done` WHERE `id` BETWEEN 35001 AND 37779'
+//37779
+		connection.query('SELECT * FROM `Done` WHERE `chinese_id` BETWEEN 1 AND 1898544'
 		// connection.query('SELECT * FROM `cedict1` WHERE `simplified`='+query+''
 		, function(err, rows, fields) {
 		if (err) throw err;
@@ -372,256 +523,47 @@ app.get('/convertsentence', function(req,res){
 		console.log('The solution is: '+ rows);
 		var stringa = JSON.stringify(rows);
 		var testj = JSON.parse(stringa);
-
+		var item = testj;
 		// res.json(rows);
+		
 		console.log('the first obj: '+ testj[0].simplified);
-
-		asyncLoop(testj, function (item, next){
-			//console.log('the first obj: '+ item.chinese_sent);
-			var carica = {};
+		testj.forEach(function(item){
+					var carica = {};
 			carica.chinese_id = item.chinese_id;
-			carica.chinese_sent = item.chinese_sent;
+			carica.chinese_sent = chineseConv.sify(item.chinese_sent);
 			carica.english_id = item.england_id;
 			carica.english_sent = item.sentence_eng;
 			console.log(carica);
+		
 			db.sentence.create(carica);
-							// db.cedict1.findOrCreate(item);
-					//  		 .spread(function(cedict, created) {
-					//   			  console.log(cedict.get({
-					//      	 plain: true
-					//     }))
-					//     console.log(created)
+			});
+
+		// asyncLoop(testj, function (item, next){
+		// 	//console.log('the first obj: '+ item.chinese_sent);
+		// 	var carica = {};
+		// 	carica.chinese_id = item.chinese_id;
+		// 	carica.chinese_sent = item.chinese_sent;
+		// 	carica.english_id = item.england_id;
+		// 	carica.english_sent = item.sentence_eng;
+		// 	console.log(carica);
+		// 	db.sentence.create(carica);
+		// 					// db.cedict1.findOrCreate(item);
+		// 			//  		 .spread(function(cedict, created) {
+		// 			//   			  console.log(cedict.get({
+		// 			//      	 plain: true
+		// 			//     }))
+		// 			//     console.log(created)
 
 						
-					//  })
-			next();
-		},function(){
+		// 			//  })
+		// 	next();
+		// },function(){
 
-		});
+		// });
 		});
 });
 
-// //GET/convert hsk to sequelize and give the uoks_id
 
-app.get('/hsk', function(req, res){
-	connection.query('SELECT * FROM `HSK` WHERE `hsk_id` BETWEEN 1 and 20',
-	function(err, rows) {
-		if (err) throw err;
-		var stringa = JSON.stringify(rows);
-			
-		var jsona = JSON.parse(stringa);
-		asyncLoop(jsona, function (item, next){
-			var it = item.hanzi;
-			db.uok.findOne({attributes :['uok_id']},{where:{simplified:it}}).then(function(result){
-				var stri = JSON.stringify(result);
-			
-		var js = JSON.parse(stri);
-				console.log(js);
-			});;
-			next();
-		});
-	});
-})
-
-//GET/test
-app.get('/test', function(req,res){
-		connection.query('SELECT * FROM `freq`WHERE `word_id` BETWEEN 18000 and 21000',
-		function(err, rows) {
-			if(err) throw err;
-			var stringa = JSON.stringify(rows);
-			
-			var jsona = JSON.parse(stringa);
-		//console.log(jsona);
-		
-
-				asyncLoop(jsona, function (item, next){
-					
-					//console.log('Item is: '+item.spelling);
-					var query = JSON.stringify(item.spelling);
-					connection.query('SELECT id, simplified, pinyin, pinyin1, pinyin2, pinyin3, translation_1 FROM `units` WHERE `simplified`='+query+''
-					, function(err, test, fields) {
-						if (err) throw err;
-						var testa = JSON.stringify(test);
-						var testj = JSON.parse(testa);
-						if(testj.length){
-							console.log('exists'+testj[0].simplified + ''+ item.spelling+'   '+ item.uok_id);
-						}else{
-							//console.log("create"+ item.dominant_pos+ item.spelling);
-							var queryc = item.spelling;
-						    connection.query('SELECT * FROM `cedict1` WHERE `simplified`='+query+''
-					         , function(err, test, fields) {
-					            	if (err) throw err;
-                                    	var text ={};
-									var tesa = JSON.stringify(test);
-									var tesj = JSON.parse(tesa);
-                                   
-									var bodis = tesj[0];
-                                    
-                                    connection.query('SELECT * FROM `HSK` WHERE `hanzi`='+query+''
-					         		, function(err, hsk, fields) {
-					            	if (err) throw err;
-
-										var teshsk = JSON.stringify(hsk);
-										var tesjhsk = JSON.parse(teshsk);
-
-										if(tesjhsk.length){
-											text.hsk_number = tesjhsk[0].hsk;
-										
-										}else{
-											test.hsk = 0;
-										}
-                                   
-							
-												text.length =item.length;
-												text.uok_id = item.word_id;
-												if(item.pinyin){
-												var pinnum = item.pinyin;
-												text.pinyin_number= pinnum.replace(/[^\d.-]/g, '');
-												}
-												text.frequency_id = item.word_id;
-												text.pinyin_input = item.pinyin_input;
-												text.Wmillion = item.Wmillion;
-												text.dominant_pos = item.dominant_pos;
-												text.simplified = item.spelling;
-                                                 
-												text.pinyin_visual = pinyin(item.spelling);
-
-                                            
-								if(tesj.length){
-                                    
-                                   
-                                      var arra ={};
-                                              var i = 0;
-                                            text.traditional = tesj[i].traditional;
-											console.log('HEy there!')
-											var pinpin = JSON.stringify(tesj[i].pinyin);
-											text.pinyin = pinpin.replace(']', '');
-										
-											text.translation_1 = tesj[i].translation_1;
-											text.translation_2 = tesj[i].translation_2;
-											text.translation_3 = tesj[i].translation_3;
-											text.translation_4 = tesj[i].translation_4;
-											text.translation_5 = tesj[i].translation_5;
-											text.translation_6 = tesj[i].translation_6;
-											text.translation_7 = tesj[i].translation_7;
-											text.translation_8 = tesj[i].translation_8;
-											text.translation_9 = tesj[i].translation_9;
-											text.translation_10 = tesj[i].translation_10;
-											text.translation_11 = tesj[i].translation_11;
-											text.translation_12 = tesj[i].translation_12;
-											text.translation_13 = tesj[i].translation_13;
-											text.translation_14 = tesj[i].translation_14;
-											text.translation_15 = tesj[i].translation_15;
-										
-                                            console.log('this is first:'+ text.translation_1);
-											
-
-                                          console.log('This word has multiple cedict entries:  '+ tesj.length);
-                                      if(tesj.length > 1){
-                                           console.log('This word has multiple cedict entries:  '+ tesj.length);
-                                       
-                                       for(var i = 1; i < tesj.length; i++){
-                                          console.log(tesj[1].translation_1)
-                                  
-                                           
-                                           if (i===1){
-                                                var pinpin = JSON.stringify(tesj[i].pinyin);
-											    text.pinyin1 = pinpin.replace(']', '');
-                                                text.translation_101 = tesj[i].translation_1;
-                                                text.translation_102 = tesj[i].translation_2;
-                                                text.translation_103 = tesj[i].translation_3;
-                                                text.translation_104= tesj[i].translation_4;
-                                                text.translation_105 = tesj[i].translation_5;
-
-                                                console.log('this is first:'+ text.translation_1);
-                                                console.log('this is second:'+ text.translation_101);
-                                           }
-
-                                           if(i===2){
-                                                var pinpin = JSON.stringify(tesj[i].pinyin);
-											    text.pinyin2 = pinpin.replace(']', '');
-                                                text.translation_201 = tesj[i].translation_1;
-                                                text.translation_202 = tesj[i].translation_2;
-                                                text.translation_203 = tesj[i].translation_3;
-                                                text.translation_204= tesj[i].translation_4;
-                                                text.translation_205 = tesj[i].translation_5;
-
-                                                console.log('this is first:'+ text.translation_1);
-                                                console.log('this is second:'+ text.translation_101);
-                                                console.log('this is third:'+ text.translation_201);
-
-                                           }
-
-                                          if(i===3){
-                                                var pinpin = JSON.stringify(tesj[i].pinyin);
-											    text.pinyin3 = pinpin.replace(']', '');
-                                                text.translation_301 = tesj[i].translation_1;
-                                                text.translation_302 = tesj[i].translation_2;
-                                                text.translation_303 = tesj[i].translation_3;
-                                                text.translation_304= tesj[i].translation_4;
-                                                text.translation_305 = tesj[i].translation_5;
-
-                                                console.log('this is first:'+ text.translation_1);
-                                                console.log('this is second:'+ text.translation_101);
-                                                console.log('this is third:'+ text.translation_201);
-                                                console.log('this is fourth:'+ text.translation_301);
-                                                console.log('this is fourth:'+ text.dominant_pos);
-                                           }
-                                          
-                                           var comp = _.compact(arra);
-                                           //console.log('the number of translations available are:' + _.size(comp));
-
-                                           console.log('Translation:'+ text);
-                                           console.log(i);
-                                       }
-                                      }
-                                   
-                                    db.units.create(text);
-                                    
-									
-								}else{
-									console.log('else entrati')
-									
-									var quer = JSON.stringify(item.spelling);
-									translate(quer).then(function(trans){
-											
-										
-										var tra = JSON.stringify(trans.translation);
-										var x =tra.replace(/["\\]/g, "");
-									    var parsero = x.replace(/[\[\]']+/g,'');
-										text.translation_1= parsero;
-										var totraditional = chineseConv.tify(item.spelling);
-										text.traditional = totraditional;
-                                        console.log(text);
-										db.units.create(text);
-                                        console.log('this is the end on the other side'+ text);
-
-									},function(e){
-										console.log(e);
-									});
-									
-									
-								
-								}
-								
-								
-							
-						
-									 });
-						});
-
-									
-							
-						}
-
-					});
-				next()
-				},function(){
-						
-			
-				});
-			});
-	});//GET
 
 
 
@@ -815,116 +757,4 @@ db.sequelize.sync(
 	});
 	
 
-//implement the hsk database
-
-// fs.readFile('hsk_1.json', 'utf8', function (err, data) {
-//   if (err) throw err;
-//   obj = JSON.parse(data);
-//  // console.log(obj);
-
-// asyncLoop(obj, function (item, next) {
-// 		var body = _.pick(item, 'hsk', 'hanzi', 'pinyin', 'meaning');
-		
-// 		//console.log("object is " + );
-		
-
-// 		db.wordbook.create(item);
-		
-// 			next();
-		
-// 	}, function ()
-// 	{
-// 		console.log('Finished!');
-// 	});
-// 	});
-
-
-// //finish hsk
-			
-			
-
-
-//implement the database
-
-// fs.readFile('db_1.json', 'utf8', function (err, data) {
-//   if (err) throw err;
-//   obj = JSON.parse(data);
-//   console.log(obj);
-
-// asyncLoop(obj, function (item, next)
-// 	{
-// 		var hsk_test = false;
-// 		var body = _.pick(item, 'spelling', 'length','pinyin', 'pinyin_input', 'Wmillion', 'dominant_pos');
-	
-// 		console.log("object is " + body.spelling);
-
-// 	db.wordbook.findOne({
-// 			where: {
-// 				hanzi : body.spelling
-// 			}
-// 		}).then(function(hsko) {
-			
-			
-			
-// 				translate(body.spelling).then(function (text) {
-// 							console.log(text);
-// 							if(hsko){ 
-// 								text.translation = hsko.meaning;
-// 								text.hsk = hsko.hsk;
-// 							}else{
-// 								text.hsk = 0;
-// 							}
-// 							text.spelling = body.spelling;
-// 							text.length = body.length;	
-// 							//var numberPin = body.pinyin.match(/\d+/g)				
-// 							text.pinyin= body.pinyin;
-// 							text.pinyin_input = body.pinyin_input;
-// 							text.Wmillion = body.Wmillion;
-// 							text.dominant_pos = body.dominant_pos;
-// 							db.worddb.create(text);
-							
-// 							console.log(text);
-							
-					
-				
-// 						}).catch(function (error) {
-// 							console.log(error);
-// 						});
-// 				});
-//         next();
-		
-// 	}, function ()
-// 	{
-// 		console.log('Finished!');
-// 	});
-// 	});
-
-
-
-
-
-//finish database code
-
-//test DB
-
-
-// fs.readFile('./database/db_1.json', 'utf8', function (err, data) {
-//   if (err) throw err;
-//   obj = JSON.parse(data);
-//   console.log(obj);
-
-// asyncLoop(obj, function (item, next)
-// 	{
-		
-// 		var body = _.pick(item, 'spelling', 'length','pinyin', 'pinyin_input', 'Wmillion', 'dominant_pos');
-// 		db.word_test.create(body);
-//         next();
-		
-// 	}, function ()
-// 	{
-// 		console.log('Finished!');
-// 	});
-// 	});
-
-//finish test DB
 

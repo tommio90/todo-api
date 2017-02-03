@@ -23,7 +23,13 @@ var database = process.env.RSD_DB_NAME;
  
 // }
 var db = {};
+
+
+
+db.base = sequelize.import(__dirname + '/models/base.js');
+
 db.uok = sequelize.import(__dirname + '/models/uok.js');
+
 db.units = sequelize.import(__dirname + '/models/units.js');
 db.uok_relationship = sequelize.import(__dirname + '/models/uok_relationship.js');
 db.cedict = sequelize.import(__dirname + '/models/cedict.js');
@@ -45,5 +51,6 @@ db.user.belongsToMany(db.uok_relationship, {through: db.many_to_many});
 
 db.todo.belongsTo(db.user);
 db.user.hasMany(db.todo);
+
 
 module.exports =db;
